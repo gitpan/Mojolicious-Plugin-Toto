@@ -1,0 +1,14 @@
+Build.PL
+Changes
+ignore.txt
+lib/Mojolicious/Plugin/Toto.pm
+lib/public/ui-bg_flat_75_ffffff_40x100.png
+lib/public/ui-bg_glass_65_ffffff_1x400.png
+lib/public/ui-bg_glass_75_e6e6e6_1x400.png
+lib/public/ui-bg_highlight-soft_75_cccccc_1x100.png
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01-beer.t

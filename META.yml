@@ -1,0 +1,25 @@
+---
+abstract: 'A simple tab and object based site structure'
+author:
+  - 'Brian Duggan <bduggan@matatu.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-Toto
+provides:
+  Mojolicious::Plugin::Toto:
+    file: lib/Mojolicious/Plugin/Toto.pm
+    version: 0.01
+  Toto:
+    file: lib/Mojolicious/Plugin/Toto.pm
+  Toto::Model:
+    file: lib/Mojolicious/Plugin/Toto.pm
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01
