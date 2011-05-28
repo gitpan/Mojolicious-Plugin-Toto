@@ -1,8 +1,9 @@
 Revision history for Mojolicious-Plugin-Toto
-0.01    Sun May 22 23:01:44 EDT 2011
-        First version
+0.01   Sun May 22 23:01:44 EDT 2011
+       First version
 
 0.02   Tue May 24 21:40:00 EDT 2011
        Separated files, fixed dependencies
 
-    
+0.03   Sat May 28 16:17:40 EDT 2011
+       Now use routes named controller/action

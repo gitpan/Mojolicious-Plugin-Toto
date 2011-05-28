@@ -12,10 +12,10 @@ get '/toto.css'      => sub { shift->render_static("toto.css") };
 
 get '/images/:which.png' =>
     [ which =>
-    qr[ui-bg_flat_75_ffffff_40x100|ui-bg_glass_65_ffffff_1x400|ui-bg_glass_75_e6e6e6_1x400|ui-bg_highlight-soft_75_cccccc_1x100] =>
+    qr[ui-bg_(?:highlight-)?(?:flat|glass|soft)_(?:\d+)_(?:\w{6})_(?:\d+)x(?:\d+)] =>
     ] => sub {
     my $c = shift;
-    my $dir = File::Spec->catdir(File::Spec->splitdir(dirname(__FILE__)), '../../public');
+    my $dir = File::Spec->catdir(File::Spec->splitdir(dirname(__FILE__)), 'public');
     $c->app->static->root($dir);
     $c->render_static( $c->stash("which") . ".png" );
 };
@@ -28,7 +28,7 @@ get '/:controller/:action' => {
     my ( $action, $controller ) = ( $c->stash("action"), $c->stash("controller") );
     if ($c->stash("action") eq 'default') {
         my $first = [ $c->actions ]->[0];
-        return $c->redirect_to( "plural" => action => $first, controller => $controller )
+        return $c->redirect_to( $c->toto_url($controller, $first) );
     }
     my $namespace = $c->app->routes->namespace || "Toto";
     my $class = join '::', $namespace, b($controller)->camelize;
@@ -53,7 +53,7 @@ get '/:controller/:action/(*key)' => {
       ( $c->stash("action"), $c->stash("controller"), $c->stash("key") );
     if ($c->stash("action") eq 'default') {
         my $first = [ $c->actions ]->[0];
-        return $c->redirect_to( "single" => action => $first, controller => $controller, key => $key )
+        return $c->redirect_to( $c->toto_url($controller,$first,$key) );
     }
     my $namespace = $c->app->routes->namespace || "Toto";
     my $class = join '::', $namespace, b($controller)->camelize;
@@ -89,7 +89,7 @@ __DATA__
     <ul class="tabs">
 % for my $c (controllers) {
         <li <%== $c eq $controller ? q[ class="active"] : "" =%>>
-            <%= link_to 'plural', { controller => $c } => begin =%><%= $c =%><%= end =%>
+            <%= link_to toto_url($c) => begin =%><%= $c =%><%= end =%>
         </li>
 % }
     </ul>
@@ -137,7 +137,7 @@ $(".toptab_container ul li").click(function() {
 <ul class="toptabs">
 % for my $a (actions) {
     <li <%== $a eq $action ? q[ class="active"] : '' %>>
-        <%= link_to 'plural', { controller => $controller, action => $a } => begin =%>
+        <%= link_to toto_url($controller,$a) => begin =%>
             <%= $a =%>
         <%= end =%>
     </li>
@@ -149,7 +149,7 @@ $(".toptab_container ul li").click(function() {
 <ul class="toptabs">
 % for my $a (actions) {
     <li <%== $a eq $action ? q[ class="active"] : '' %>>
-        <%= link_to 'single', { controller => $controller, action => $a, key => $key } => begin =%>
+        <%= link_to toto_url($controller, $a, $instance->key) => begin =%>
             <%= $a =%>
         <%= end =%>
     </li>
@@ -190,13 +190,13 @@ sub <%= $action %> {
 
 cat > templates/<%= $controller %>/<%= $action %>.html.ep
 <%= '%' %> for (1..10) {
-<%= '%' %>= link_to 'single', { controller => $controller, key => $_ } => begin
+<%= '%' %>= link_to toto_url($controller, 'default', $_) => begin
 &lt;%= $controller %&gt; &lt;%= $_ %&gt;&lt;br&gt;
 <%= '%' %>= end
 <%= '%' %> }
 </pre>
 % for (1..10) {
-%= link_to 'single', { controller => $controller, key => $_ } => begin
+%= link_to toto_url($controller, 'default', $_) => begin
 <%= $controller %> <%= $_ %><br>
 %= end
 % }
