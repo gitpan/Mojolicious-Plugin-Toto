@@ -20,58 +20,6 @@ get '/images/:which.png' =>
     $c->render_static( $c->stash("which") . ".png" );
 };
 
-get '/:controller/:action' => {
-    action    => "default",
-    layout    => "toto"
-  } => sub {
-    my $c = shift;
-    my ( $action, $controller ) = ( $c->stash("action"), $c->stash("controller") );
-    if ($c->stash("action") eq 'default') {
-        my $first = [ $c->actions ]->[0];
-        return $c->redirect_to( $c->toto_url($controller, $first) );
-    }
-    my $namespace = $c->app->routes->namespace || "Toto";
-    my $class = join '::', $namespace, b($controller)->camelize;
-    my $root = $c->app->renderer->root;
-    my ($template) = grep {-e "$root/$_.html.ep" } "$controller/$action", $action;
-    $c->stash->{template} = $template || 'plural';
-    if ($class->can($action)) {
-        app->log->debug("calling $action of $class");
-        bless $c, $class;
-        $c->$action;
-        bless $c, 'Mojolicious::Controller';
-    }
-    $c->render;
-  } => 'plural';
-
-get '/:controller/:action/(*key)' => {
-    action      => "default",
-    layout      => "toto"
-} => sub {
-    my $c = shift;
-    my ( $action, $controller, $key ) =
-      ( $c->stash("action"), $c->stash("controller"), $c->stash("key") );
-    if ($c->stash("action") eq 'default') {
-        my $first = [ $c->actions ]->[0];
-        return $c->redirect_to( $c->toto_url($controller,$first,$key) );
-    }
-    my $namespace = $c->app->routes->namespace || "Toto";
-    my $class = join '::', $namespace, b($controller)->camelize;
-    my $root = $c->app->renderer->root;
-    my ($template) = grep {-e "$root/$_.html.ep" } "$controller/$action", $action;
-    $c->stash->{template} = $template || 'single';
-    my $object = $c->model_class->new(key => $c->stash("key"));
-    $c->stash(instance => $object);
-    if ($class->can($action)) {
-        app->log->debug("calling $action of $class with a model object");
-        $c->stash($controller => $object);
-        bless $c, $class;
-        $c->$action($object);
-        bless $c, 'Mojolicious::Controller';
-    }
-    $c->render;
-} => 'single';
-
 1;
 __DATA__
 @@ layouts/toto.html.ep
@@ -80,8 +28,8 @@ __DATA__
 <head>
 <title><%= title %></title>
 %= base_tag
-%= stylesheet toto_path.'/toto.css';
-%= stylesheet toto_path.'/jq.css';
+%= stylesheet '/toto.css';
+%= stylesheet '/jq.css';
 %= javascript '/js/jquery.js';
 </head>
 <body>
@@ -89,7 +37,7 @@ __DATA__
     <ul class="tabs">
 % for my $c (controllers) {
         <li <%== $c eq $controller ? q[ class="active"] : "" =%>>
-            <%= link_to toto_url($c) => begin =%><%= $c =%><%= end =%>
+            <%= link_to $c => begin =%><%= $c =%><%= end =%>
         </li>
 % }
     </ul>
@@ -137,7 +85,7 @@ $(".toptab_container ul li").click(function() {
 <ul class="toptabs">
 % for my $a (actions) {
     <li <%== $a eq $action ? q[ class="active"] : '' %>>
-        <%= link_to toto_url($controller,$a) => begin =%>
+        <%= link_to "$controller/$a" => begin =%>
             <%= $a =%>
         <%= end =%>
     </li>
@@ -149,7 +97,7 @@ $(".toptab_container ul li").click(function() {
 <ul class="toptabs">
 % for my $a (actions) {
     <li <%== $a eq $action ? q[ class="active"] : '' %>>
-        <%= link_to toto_url($controller, $a, $instance->key) => begin =%>
+        <%= link_to "$controller/$a/".$instance->key => begin =%>
             <%= $a =%>
         <%= end =%>
     </li>
@@ -190,13 +138,13 @@ sub <%= $action %> {
 
 cat > templates/<%= $controller %>/<%= $action %>.html.ep
 <%= '%' %> for (1..10) {
-<%= '%' %>= link_to toto_url($controller, 'default', $_) => begin
+<%= '%' %>= link_to "$controller/default/$_" => begin
 &lt;%= $controller %&gt; &lt;%= $_ %&gt;&lt;br&gt;
 <%= '%' %>= end
 <%= '%' %> }
 </pre>
 % for (1..10) {
-%= link_to toto_url($controller, 'default', $_) => begin
+%= link_to "$controller/default/$_" => begin
 <%= $controller %> <%= $_ %><br>
 %= end
 % }

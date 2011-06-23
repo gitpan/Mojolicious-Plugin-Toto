@@ -8,24 +8,24 @@ Mojolicious::Plugin::Toto - A simple tab and object based site structure
  #!/usr/bin/env perl
  use Mojolicious::Lite;
 
+ get '/my/url/to/list/beers' => sub {
+      shift->render_text("Here is a page for listing beers.");
+ } => "beer/list";
+
+ get '/beer/create' => sub {
+    shift->render_text("Here is a page to create a beer.");
+ } => "beer/create";
+
  plugin 'toto' =>
-    path => "/toto",
-    namespace => "Beer",
     menu => [
-        beer    => { one  => [qw/ingredients pubs/],
-                     many => [qw/search browse/] },
-        brewery => { one  => [qw/directions beers info/],
+        beer    => { one  => [qw/view edit pictures notes/],
+                     many => [qw/list create search browse/] },
+        brewery => { one  => [qw/view edit directions beers info/],
                      many => [qw/phonelist mailing_list/] },
-        pub     => { one  => [qw/info comments/],
+        pub     => { one  => [qw/view info comments hours/],
                      many => [qw/search map/] },
- #  $controller (object) => { one => [ ..actions on one object ],
- #                          many => [ ..actions on 0 or many objects ]
     ]
  ;
-
- get '/my/url/to/search/for/beers' => sub {
-      shift->render_text("here is my awesome beer search page");
- } => "beer/search";
 
  app->start
 
@@ -33,43 +33,37 @@ Mojolicious::Plugin::Toto - A simple tab and object based site structure
 
 =head1 DESCRIPTION
 
-This is an implementation of a navigational structure
-called "toto": "tabs on this object" which is
-as follows :
+This plugin provides a navigational structure for a Mojolicious
+or Mojolicious::Lite app.
 
-Given a collection of objects (e.g. beers, breweries,
-pubs), come up with two types of pages :
+It provides a menu for changing between types of objects, and it
+provides rows of tabs which correspond to actions.
 
-    - pages associated with one object (e.g. view, edit)
+It extends the idea of BREAD or CRUD -- in a BREAD application,
+browse and add are operations on aggregate (0 or many) objects, while
+edit, add, and delete are operations on 1 object.
 
-    - pages associated with zero or more than one object (e.g. search, browse)
+Toto groups all pages into two categories : either they act on one
+object, or they act on 0 or many objects.
 
-Then Toto refers to a screen with three types of tab lists :
+A rows of tabs is displayed which shows other actions.  The actions
+in the row depend on context -- the type of object, and whether or not
+an object is selected.
 
-    - a list of all the objects
+A second row of tabs on the left shows all possible object types.
 
-    - a list of all the actions possible on one object
+A data structure is used to configure the navigational structure.
+This data structure should describe the types of objects
+as well as the possible actions.
 
-    - a list of all the actions possible on zero or multiple objects
+For Mojolicious::Lite apps, routes whose names are of the form
+"controller/action" will automatically be placed into the navigational
+structure.  Note that each "controller" corresponds to one "object".
 
-After creating a structure, as in the synopsis, and starting
-a mojolicious app, there will be a site as well as sample code
-and sample objects.
+For Mojolicious (not lite) apps, methods in controller classes will
+be used if they exist.
 
-Route names of the form "controller/action" will automatically
-be placed into the toto navigational structure.
-
-Controller classes may also be used; they will be automatically
-called if they exist (e.g. "Beer::Pub::search()").
-
-A template for a given page may be in either of these two places :
-
-    templates/$controller/$action.html.ep
-    templates/$action.html.ep
-
-=head1 TODO
-
-much more documentation
+Styling is done (mostly) with jquery css.
 
 =cut
 
@@ -80,78 +74,105 @@ use Toto;
 use strict;
 use warnings;
 
-our $VERSION = 0.03;
-
-our $mainRoutes;
-sub _main_routes {
-     my $c = shift;
-     our $mainRoutes;
-     $mainRoutes ||= { map { ( $_->name => 1 ) }
-          grep { $_->name && $_->name =~ m[/] }
-          @{ $c->main_app->routes->children || [] }
-     };
-     return $mainRoutes;
-}
-
-sub _toto_url {
-     my ($c,$controller,$action,$key) = @_;
-     if ( $controller && $action && _main_routes($c)->{"$controller/$action"} ) {
-        $c->app->log->debug("found a route for $controller/$action");
-        return $c->main_app->url_for( "$controller/$action",
-            { controller => $controller, action => $action, key => $key } );
-     }
-     $c->app->log->debug("default route for $controller".($action ? "/$action" : ""));
-     # url_for "plural" or "single" doesn't work for the first http
-     # request for some reason (toto_path is excluded)
-     my $url = $c->req->url->clone;
-     $url->path->parts([$c->toto_path, $controller]);
-     push @{ $url->path->parts }, $action if $action;
-     push @{ $url->path->parts }, $key if $action && defined($key);
-     return $url;
-}
+our $VERSION = 0.04;
 
 sub register {
     my ($self, $app, $conf) = @_;
 
-    my $path  = $conf->{path}      || '/toto';
-    my $namespace = $conf->{namespace} || $app->routes->namespace || "Toto";
     my @menu = @{ $conf->{menu} || [] };
     my %menu = @menu;
 
-    $app->routes->route($path)->detour(app => Toto::app());
-    Toto::app()->routes->namespace($namespace);
-    Toto::app()->renderer->default_template_class("Toto");
+    $app->routes->get('/jq.css')->to("Toto");
+    $app->routes->get('/toto.css')->to("Toto");
+    $app->routes->get('/images/:which.png')->to("Toto"); # TODO subdir
 
+    for my $controller (keys %menu) {
+
+        my $first;
+        for my $action (@{ $menu{$controller}{many} || []}) {
+            # TODO skip existing routes
+            $first ||= $action;
+            $app->log->debug("Adding route for $controller/$action");
+            $app->routes->get(
+                "/$controller/$action" => sub {
+                    my $c = shift;
+                    $c->stash->{template}       = "plural";
+                    $c->stash->{template_class} = 'Toto';
+                  } => {
+                    controller => $controller,
+                    action     => $action,
+                    layout     => "toto"
+                  } => "$controller/$action"
+            );
+        }
+        my $first_action = $first;
+        $app->routes->get(
+            "/$controller" => sub {
+                shift->redirect_to("$controller/$first_action");
+              } => "$controller"
+        );
+        $first = undef;
+        for my $action (@{ $menu{$controller}{one} || [] }) {
+            # TODO skip existing routes
+            $first ||= $action;
+            $app->routes->get(
+                "/$controller/$action/(*key)" => sub {
+                    my $c = shift;
+                    $c->stash->{template}       = "single";
+                    $c->stash->{template_class} = 'Toto';
+                    $c->stash(instance => $c->model_class->new(key => $c->stash('key')));
+                  } => {
+                      controller => $controller,
+                      action     => $action,
+                      layout => "toto",
+                  } => "$controller/$action"
+            );
+        }
+        my $first_key = $first;
+        $app->routes->get(
+            "/$controller/default/(*key)" => sub {
+                my $c = shift;
+                my $key = $c->stash("key");
+                $c->redirect_to("$controller/$first_key/$key");
+              } => "$controller/default"
+        );
+
+    }
     my @controllers = grep !ref($_), @menu;
+    my $first_controller = $controllers[0];
+    $app->routes->get('/' => sub { shift->redirect_to($first_controller) } );
+
     for ($app, Toto::app()) {
-        $_->helper( main_app => sub { $app } );
-        $_->helper( toto_url => \&_toto_url );
-        $_->helper( toto_path   => sub { $path } );
         $_->helper( model_class => sub { $conf->{model_class} || "Toto::Model" });
         $_->helper( controllers => sub { @controllers } );
         $_->helper(
             actions => sub {
                 my $c    = shift;
-                my $for  = shift || $c->stash("controller");
+                my $for  = shift || $c->stash("controller") || die "no controller";
                 my $mode = defined( $c->stash("key") ) ? "one" : "many";
                 @{ $menu{$for}{$mode} || [] };
             }
         );
     }
 
-    $app->hook(before_render => sub {
-            my $c = shift;
-            my $name = $c->stash("template"); # another method for name?
-            return unless $name && _main_routes($c)->{$name};
-            my ($controller,$action) = $name =~ m{^(.*)/(.*)$};
-            $c->app->log->info("found $action, $controller");
+    $app->hook(
+        before_render => sub {
+            my $c    = shift;
+            my $args = shift;
+            return if $args->{partial};
+            return if $args->{no_toto} or $c->stash("no_toto");
+            return unless $c->match && $c->match->endpoint;
+            my $name = $c->match->endpoint->name;
+            my ( $controller, $action ) = $name =~ m{^(.*)/(.*)$};
+            return unless $controller && $action;
             $c->stash->{template_class} = "Toto";
-            $c->stash->{layout} = "toto";
-            $c->stash->{action} = $action;
-            $c->stash->{controller} = $controller;
-            my $key = $c->stash("key") or return;
-            $c->stash(instance => $c->model_class->new(key => $key));
-        });
+            $c->stash->{layout}         = "toto";
+            $c->stash->{action}         = $action;
+            $c->stash->{controller}     = $controller;
+            my $key = $c->stash("key") or return 1;
+            $c->stash( instance => $c->model_class->new( key => $key ) );
+        }
+    );
 }
 
 1;

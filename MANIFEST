@@ -14,3 +14,4 @@ META.yml
 README
 t/00-load.t
 t/01-beer.t
+t/02-custom-urls.t

@@ -15,19 +15,19 @@ my $menu = [
     }
 ];
 
-plugin 'toto' => path => "/app", menu => $menu;
+plugin 'toto' => menu => $menu;
 
 my $t = Test::Mojo->new();
-$t->max_redirects(1);
+$t->max_redirects(2);
 
-$t->get_ok('/app')->status_is(200)->content_like(qr/welcome/i);
-$t->get_ok('/app/beer')->status_is(200)->content_like(qr/search/i);
-$t->get_ok('/app/pub')->status_is(200)->content_like(qr/map/i);
+$t->get_ok('/')->status_is(200)->content_like(qr/search/i);
+$t->get_ok('/beer')->status_is(200)->content_like(qr/search/i);
+$t->get_ok('/pub')->status_is(200)->content_like(qr/map/i);
 
 while ( my $item = shift @$menu) {
     my %tabs = %{ shift @$menu };
-    $t->get_ok("/app/$item/$_")->status_is(200) for @{ $tabs{many} };
-    $t->get_ok("/app/$item/$_/20")->status_is(200) for @{ $tabs{one} };
+    $t->get_ok("/$item/$_")->status_is(200) for @{ $tabs{many} };
+    $t->get_ok("/$item/$_/20")->status_is(200) for @{ $tabs{one} };
 }
 
 done_testing();
