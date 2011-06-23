@@ -10,7 +10,7 @@ get '/' => { layout => "toto", controller => '', action => '' } => 'toto';
 get '/jq.css'        => sub { shift->render_static("jq.css")   };
 get '/toto.css'      => sub { shift->render_static("toto.css") };
 
-get '/images/:which.png' =>
+get '/toto/images/:which.png' =>
     [ which =>
     qr[ui-bg_(?:highlight-)?(?:flat|glass|soft)_(?:\d+)_(?:\w{6})_(?:\d+)x(?:\d+)] =>
     ] => sub {
@@ -33,16 +33,16 @@ __DATA__
 %= javascript '/js/jquery.js';
 </head>
 <body>
-<div class="container">
-    <ul class="tabs">
+<div class="ui-tabs ui-widget ui-widget-content ui-corner-all container">
+    <ul class="ui-widget tabs">
 % for my $c (controllers) {
-        <li <%== $c eq $controller ? q[ class="active"] : "" =%>>
+        <li <%== $c eq $controller ? q[ class="ui-state-active"] : "" =%>>
             <%= link_to $c => begin =%><%= $c =%><%= end =%>
         </li>
 % }
     </ul>
     <div class="tab_container">
-         <div class="toptab_container">
+         <div class="toptab_container ui-tabs ui-widget ui-widget-content ui-corner-all">
 % if (stash 'key') {
 %= include 'top_tabs_single';
 % } else {
@@ -61,30 +61,50 @@ $(".toptab_container").show(); //Show tab content
 //On Click Event
 $("ul.tabs li").click(function() {
     $("ul.tabs li").removeClass("active"); //Remove any "active" class
+    $("ul.tabs li").removeClass("ui-state-active"); //Remove any "active" class
     $(this).addClass("active"); //Add "active" class to selected tab
+    $(this).addClass("ui-state-active"); //Add "active" class to selected tab
     $(".toptab_container").hide(); //Hide all tab content
     var activeTab = $(this).find("a").attr("href"); //Find the active tab + content
     $(activeTab).fadeIn(); //Fade in the active content
     return false;
 });
 //$(".toptab_container").tabs();
-$(".toptab_container").addClass("ui-tabs ui-widget ui-widget-content ui-corner-all");
-$(".toptab_container ul").addClass("ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all");
 $(".toptab_container ul li").addClass("ui-state-default ui-corner-top");
-$(".toptab_container ul li.active").addClass("ui-state-active");
 $(".toptab_container ul li").click(function() {
     $("ul.toptabs li").removeClass("ui-state-active");
+    $("ul.toptabs li").removeClass("active");
     $(".page_content").hide();
     $(this).addClass("ui-state-active");
 });
 
 </script>
+
+% if (toto_config->{themeswitcher}) {
+% my $theme = $self->cookie('toto-theme') || "Smoothness";
+% $theme = b($theme)->url_unescape;
+<script>
+$(document).ready(function () {
+    $.cookie('jquery-ui-theme', "<%= $theme %>");
+    $('#ThemeRoller').themeswitcher({
+        loadTheme : "<%= $theme %>",
+        onSelect : function() {
+         $.cookie('toto-theme', $.cookie("jquery-ui-theme"), { path : '/' });
+         }
+        });
+});
+</script>
+<script type="text/javascript"
+  src="http://jqueryui.com/themeroller/themeswitchertool/">
+</script>
+<div id="ThemeRoller" style='position:fixed; top:2px; right:5px;'></div>
+% }
 </html>
 
 @@ top_tabs_plural.html.ep
-<ul class="toptabs">
+<ul class="toptabs ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
 % for my $a (actions) {
-    <li <%== $a eq $action ? q[ class="active"] : '' %>>
+    <li <%== $a eq $action ? q[ class="active ui-state-active"] : '' %>>
         <%= link_to "$controller/$a" => begin =%>
             <%= $a =%>
         <%= end =%>
@@ -94,9 +114,9 @@ $(".toptab_container ul li").click(function() {
 
 @@ top_tabs_single.html.ep
 <h2><%= $controller %> <%= $instance->key %></h2>
-<ul class="toptabs">
+<ul class="toptabs ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
 % for my $a (actions) {
-    <li <%== $a eq $action ? q[ class="active"] : '' %>>
+    <li <%== $a eq $action ? q[ class="active ui-state-active"] : '' %>>
         <%= link_to "$controller/$a/".$instance->key => begin =%>
             <%= $a =%>
         <%= end =%>
@@ -108,18 +128,13 @@ $(".toptab_container ul li").click(function() {
 @@ single.html.ep
 This is the page for <%= $action %> for
 <%= $controller %> <%= $key %>.
-<pre class="code">
-cat > lib/<%= $self->app->routes->namespace %>/<%= b($controller)->camelize %>.pm
-package <%= $self->app->routes->namespace %>::<%= b($controller)->camelize %>;
-use Mojo::Base 'Mojolicious::Controller';
-sub <%= $action %> {
-    my $c = shift;
-    my $<%= $controller %> = shift;
-    # <%= $action %> for <%= $controller %>
+<pre class="ui-widget code">
+get '/<%= $controller %>/<%= $action %>' => sub {
+    # or define <%= $self->app->routes->namespace %>::<%= b($controller)->camelize %>::<%= $action %>()
     ...
-}
+} => '<%= $controller %>/<%= $action %>';
 
-cat > templates/<%= $controller %>/<%= $action %>.html.ep
+# templates/<%= $controller %>/<%= $action %>.html.ep
 This is the page for
 &lt%= $action %&gt; for &lt;%= $controller %&gt;
 &lt;%= $<%= $controller %>-&gt;key %&gt;
@@ -127,19 +142,16 @@ This is the page for
 
 @@ plural.html.ep
 % use Mojo::ByteStream qw/b/;
-<pre class="code">
-cat > lib/<%= $self->app->routes->namespace %>/<%= b($controller)->camelize %>.pm
-package <%= $self->app->routes->namespace %>::<%= b($controller)->camelize %>;
-use Mojo::Base 'Mojolicious::Controller';
-sub <%= $action %> {
-    my $c = shift;
+<pre class="ui-widget code">
+get '/<%= $controller %>/<%= $action %>' => sub {
+    # or define <%= $self->app->routes->namespace %>::<%= b($controller)->camelize %>::<%= $action %>()
     ...
-}
+} => '<%= $controller %>/<%= $action %>';
 
-cat > templates/<%= $controller %>/<%= $action %>.html.ep
+# templates/<%= $controller %>/<%= $action %>.html.ep
 <%= '%' %> for (1..10) {
-<%= '%' %>= link_to "$controller/default/$_" => begin
-&lt;%= $controller %&gt; &lt;%= $_ %&gt;&lt;br&gt;
+<%= '%' %>= link_to "<%= $controller %>/default/$_" => begin
+<%= $controller %> &lt;%= $_ %&gt;&lt;br&gt;
 <%= '%' %>= end
 <%= '%' %> }
 </pre>
@@ -166,7 +178,7 @@ body {
     background: #f0f0f0;
     margin: 0;
     padding: 0;
-    font: 10px normal Verdana, Arial, Helvetica, sans-serif;
+    font: Verdana, Arial, Helvetica, sans-serif;
     color: #444;
 }
 .container {width: 90% margin: 10px auto; height:95%;}
@@ -176,8 +188,6 @@ ul.tabs {
     float: left;
     list-style: none;
     height: 32px;
-    border-bottom: 1px solid #999;
-    border-left: 1px solid #999;
     width: 15%;
 }
 ul.tabs li {
@@ -186,28 +196,21 @@ ul.tabs li {
     padding: 0;
     height: 31px;
     line-height: 31px;
-    border: 1px solid #999;
     border-left: none;
     margin-bottom: 0px;
-    background: #e0e0e0;
     overflow: hidden;
     position: relative;
 }
 ul.tabs li a {
     text-decoration: none;
-    color: #000;
     display: block;
     font-size: 1.2em;
     padding: 0 20px;
-    border: 1px solid #fff;
     outline: none;
 }
 ul.tabs li a:hover {
-    background: #ccc;
 }   
 html ul.tabs li.active, html ul.tabs li.active a:hover  {
-    background: #fff;
-    border-bottom: 1px solid #fff;
 }
 .tab_container {
     border: 1px solid #999;
@@ -239,7 +242,7 @@ pre.code {
     margin-right:20px;
     padding:5px;
     border:1px grey dashed;
-    background-color:#dda;
+    font-family:monospace;
     }
 
 @@ jq.css
@@ -287,25 +290,25 @@ pre.code {
 .ui-widget { font-family: Verdana,Arial,sans-serif; font-size: 1.1em; }
 .ui-widget .ui-widget { font-size: 1em; }
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Verdana,Arial,sans-serif; font-size: 1em; }
-.ui-widget-content { border: 1px solid #aaaaaa; background: #ffffff url(images/ui-bg_flat_75_ffffff_40x100.png) 50% 50% repeat-x; color: #222222; }
+.ui-widget-content { border: 1px solid #aaaaaa; background: #ffffff url(/toto/images/ui-bg_flat_75_ffffff_40x100.png) 50% 50% repeat-x; color: #222222; }
 .ui-widget-content a { color: #222222; }
-.ui-widget-header { border: 1px solid #aaaaaa; background: #cccccc url(images/ui-bg_highlight-soft_75_cccccc_1x100.png) 50% 50% repeat-x; color: #222222; font-weight: bold; }
+.ui-widget-header { border: 1px solid #aaaaaa; background: #cccccc url(/toto/images/ui-bg_highlight-soft_75_cccccc_1x100.png) 50% 50% repeat-x; color: #222222; font-weight: bold; }
 .ui-widget-header a { color: #222222; }
 
 /* Interaction states
 ----------------------------------*/
-.ui-state-default, .ui-widget-content .ui-state-default { border: 1px solid #d3d3d3; background: #e6e6e6 url(images/ui-bg_glass_75_e6e6e6_1x400.png) 50% 50% repeat-x; font-weight: normal; color: #555555; outline: none; }
+.ui-state-default, .ui-widget-content .ui-state-default { border: 1px solid #d3d3d3; background: #e6e6e6 url(/toto/images/ui-bg_glass_75_e6e6e6_1x400.png) 50% 50% repeat-x; font-weight: normal; color: #555555; outline: none; }
 .ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited { color: #555555; text-decoration: none; outline: none; }
-.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus { border: 1px solid #999999; background: #dadada url(images/ui-bg_glass_75_dadada_1x400.png) 50% 50% repeat-x; font-weight: normal; color: #212121; outline: none; }
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus { border: 1px solid #999999; background: #dadada url(/toto/images/ui-bg_glass_75_dadada_1x400.png) 50% 50% repeat-x; font-weight: normal; color: #212121; outline: none; }
 .ui-state-hover a, .ui-state-hover a:hover { color: #212121; text-decoration: none; outline: none; }
-.ui-state-active, .ui-widget-content .ui-state-active { border: 1px solid #aaaaaa; background: #ffffff url(images/ui-bg_glass_65_ffffff_1x400.png) 50% 50% repeat-x; font-weight: normal; color: #212121; outline: none; }
+.ui-state-active, .ui-widget-content .ui-state-active { border: 1px solid #aaaaaa; background: #ffffff url(/toto/images/ui-bg_glass_65_ffffff_1x400.png) 50% 50% repeat-x; font-weight: normal; color: #212121; outline: none; }
 .ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited { color: #212121; outline: none; text-decoration: none; }
 
 /* Interaction Cues
 ----------------------------------*/
-.ui-state-highlight, .ui-widget-content .ui-state-highlight {border: 1px solid #fcefa1; background: #fbf9ee url(images/ui-bg_glass_55_fbf9ee_1x400.png) 50% 50% repeat-x; color: #363636; }
+.ui-state-highlight, .ui-widget-content .ui-state-highlight {border: 1px solid #fcefa1; background: #fbf9ee url(/toto/images/ui-bg_glass_55_fbf9ee_1x400.png) 50% 50% repeat-x; color: #363636; }
 .ui-state-highlight a, .ui-widget-content .ui-state-highlight a { color: #363636; }
-.ui-state-error, .ui-widget-content .ui-state-error {border: 1px solid #cd0a0a; background: #fef1ec url(images/ui-bg_glass_95_fef1ec_1x400.png) 50% 50% repeat-x; color: #cd0a0a; }
+.ui-state-error, .ui-widget-content .ui-state-error {border: 1px solid #cd0a0a; background: #fef1ec url(/toto/images/ui-bg_glass_95_fef1ec_1x400.png) 50% 50% repeat-x; color: #cd0a0a; }
 .ui-state-error a, .ui-widget-content .ui-state-error a { color: #cd0a0a; }
 .ui-state-error-text, .ui-widget-content .ui-state-error-text { color: #cd0a0a; }
 .ui-state-disabled, .ui-widget-content .ui-state-disabled { opacity: .35; filter:Alpha(Opacity=35); background-image: none; }
@@ -327,8 +330,8 @@ pre.code {
 .ui-corner-all { -moz-border-radius: 4px; -webkit-border-radius: 4px; }
 
 /* Overlays */
-.ui-widget-overlay { background: #aaaaaa url(images/ui-bg_flat_0_aaaaaa_40x100.png) 50% 50% repeat-x; opacity: .30;filter:Alpha(Opacity=30); }
-.ui-widget-shadow { margin: -8px 0 0 -8px; padding: 8px; background: #aaaaaa url(images/ui-bg_flat_0_aaaaaa_40x100.png) 50% 50% repeat-x; opacity: .30;filter:Alpha(Opacity=30); -moz-border-radius: 8px; -webkit-border-radius: 8px; }
+.ui-widget-overlay { background: #aaaaaa url(/toto/images/ui-bg_flat_0_aaaaaa_40x100.png) 50% 50% repeat-x; opacity: .30;filter:Alpha(Opacity=30); }
+.ui-widget-shadow { margin: -8px 0 0 -8px; padding: 8px; background: #aaaaaa url(/toto/images/ui-bg_flat_0_aaaaaa_40x100.png) 50% 50% repeat-x; opacity: .30;filter:Alpha(Opacity=30); -moz-border-radius: 8px; -webkit-border-radius: 8px; }
 
 
 /* Tabs

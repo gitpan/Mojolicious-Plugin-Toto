@@ -15,7 +15,7 @@ name: Mojolicious-Plugin-Toto
 provides:
   Mojolicious::Plugin::Toto:
     file: lib/Mojolicious/Plugin/Toto.pm
-    version: 0.04
+    version: 0.05
   Toto:
     file: lib/Toto.pm
   Toto::Model:
@@ -24,4 +24,4 @@ requires:
   Mojolicious: 1.46
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.04
+version: 0.05

@@ -4,8 +4,6 @@ Mojolicious::Plugin::Toto - A simple tab and object based site structure
 
 =head1 SYNOPSIS
 
- cat > ./Beer
- #!/usr/bin/env perl
  use Mojolicious::Lite;
 
  get '/my/url/to/list/beers' => sub {
@@ -24,7 +22,8 @@ Mojolicious::Plugin::Toto - A simple tab and object based site structure
                      many => [qw/phonelist mailing_list/] },
         pub     => { one  => [qw/view info comments hours/],
                      many => [qw/search map/] },
-    ]
+    ],
+    themeswitcher => 1,
  ;
 
  app->start
@@ -33,11 +32,8 @@ Mojolicious::Plugin::Toto - A simple tab and object based site structure
 
 =head1 DESCRIPTION
 
-This plugin provides a navigational structure for a Mojolicious
-or Mojolicious::Lite app.
-
-It provides a menu for changing between types of objects, and it
-provides rows of tabs which correspond to actions.
+This plugin provides a navigational structure and a default set
+of routes for a Mojolicious or Mojolicious::Lite app.
 
 It extends the idea of BREAD or CRUD -- in a BREAD application,
 browse and add are operations on aggregate (0 or many) objects, while
@@ -46,24 +42,32 @@ edit, add, and delete are operations on 1 object.
 Toto groups all pages into two categories : either they act on one
 object, or they act on 0 or many objects.
 
-A rows of tabs is displayed which shows other actions.  The actions
-in the row depend on context -- the type of object, and whether or not
-an object is selected.
+One set of tabs provides a way to change between types of objects.
+Another row of tabs provides a way to change actions.
 
-A second row of tabs on the left shows all possible object types.
+The actions displayed depend on context -- the type of object, and
+whether or not an object is selected determine the list of actions
+that are displayed
 
-A data structure is used to configure the navigational structure.
-This data structure should describe the types of objects
-as well as the possible actions.
+The toto menu data structure is used to generate default routes of
+the form controller/action, for each controller+action pair.
+It is also used to generate the menu and tabs.
 
-For Mojolicious::Lite apps, routes whose names are of the form
-"controller/action" will automatically be placed into the navigational
-structure.  Note that each "controller" corresponds to one "object".
+By loading the plugin after creating routes, any routes created
+manually which use this naming convention will take precedence over
+the default ones.
 
 For Mojolicious (not lite) apps, methods in controller classes will
 be used if they exist.
 
+Because routes are created automatically, creating a page may be
+done by just adding a file named templates/controller/action.html.ep.
+
 Styling is done (mostly) with jquery css.
+
+=head1 SEE ALSO
+
+http://www.beer.dotcloud.com
 
 =cut
 
@@ -74,7 +78,7 @@ use Toto;
 use strict;
 use warnings;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -84,7 +88,7 @@ sub register {
 
     $app->routes->get('/jq.css')->to("Toto");
     $app->routes->get('/toto.css')->to("Toto");
-    $app->routes->get('/images/:which.png')->to("Toto"); # TODO subdir
+    $app->routes->get('/toto/images/:which.png')->to("Toto");
 
     for my $controller (keys %menu) {
 
@@ -96,6 +100,9 @@ sub register {
             $app->routes->get(
                 "/$controller/$action" => sub {
                     my $c = shift;
+                    my $root = $c->app->renderer->root;
+                    my @found = glob "$root/$controller/$action.*";
+                    return if @found;
                     $c->stash->{template}       = "plural";
                     $c->stash->{template_class} = 'Toto';
                   } => {
@@ -118,9 +125,12 @@ sub register {
             $app->routes->get(
                 "/$controller/$action/(*key)" => sub {
                     my $c = shift;
+                    $c->stash(instance => $c->model_class->new(key => $c->stash('key')));
+                    my $root = $c->app->renderer->root;
+                    my @found = glob "$root/$controller/$action.*";
+                    return if @found;
                     $c->stash->{template}       = "single";
                     $c->stash->{template_class} = 'Toto';
-                    $c->stash(instance => $c->model_class->new(key => $c->stash('key')));
                   } => {
                       controller => $controller,
                       action     => $action,
@@ -143,6 +153,7 @@ sub register {
     $app->routes->get('/' => sub { shift->redirect_to($first_controller) } );
 
     for ($app, Toto::app()) {
+        $_->helper( toto_config => sub { $conf } );
         $_->helper( model_class => sub { $conf->{model_class} || "Toto::Model" });
         $_->helper( controllers => sub { @controllers } );
         $_->helper(
