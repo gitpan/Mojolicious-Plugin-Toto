@@ -15,9 +15,8 @@ get '/toto/images/:which.png' =>
     qr[ui-bg_(?:highlight-)?(?:flat|glass|soft)_(?:\d+)_(?:\w{6})_(?:\d+)x(?:\d+)] =>
     ] => sub {
     my $c = shift;
-    my $dir = File::Spec->catdir(File::Spec->splitdir(dirname(__FILE__)), 'public');
-    $c->app->static->root($dir);
-    $c->render_static( $c->stash("which") . ".png" );
+    my $which = $c->stash("which").".png";
+    $c->render_static( $which );
 };
 
 1;
@@ -129,8 +128,10 @@ $(document).ready(function () {
 This is the page for <%= $action %> for
 <%= $controller %> <%= $key %>.
 <pre class="ui-widget code">
-get '/<%= $controller %>/<%= $action %>' => sub {
+get '/<%= $controller %>/<%= $action %>/*key' => sub {
+% if ($self->app->routes->namespace) {
     # or define <%= $self->app->routes->namespace %>::<%= b($controller)->camelize %>::<%= $action %>()
+% }
     ...
 } => '<%= $controller %>/<%= $action %>';
 
@@ -144,7 +145,9 @@ This is the page for
 % use Mojo::ByteStream qw/b/;
 <pre class="ui-widget code">
 get '/<%= $controller %>/<%= $action %>' => sub {
+% if ($self->app->routes->namespace) {
     # or define <%= $self->app->routes->namespace %>::<%= b($controller)->camelize %>::<%= $action %>()
+% }
     ...
 } => '<%= $controller %>/<%= $action %>';
 
@@ -345,4 +348,22 @@ pre.code {
 .ui-tabs .ui-tabs-nav li a, .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a { cursor: pointer; } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
 .ui-tabs .ui-tabs-panel { padding: 1em 1.4em; display: block; border-width: 0; background: none; }
 .ui-tabs .ui-tabs-hide { display: none !important; }
+
+@@ ui-bg_flat_75_ffffff_40x100.png (base64)
+iVBORw0KGgoAAAANSUhEUgAAACgAAABkCAYAAAD0ZHJ6AAAAeUlEQVRoge3OMQHAIBAAsVL/nh8J
+DDfAkCjImpn5HvbfDpwIVoKVYCVYCVaClWAlWAlWgpVgJVgJVoKVYCVYCVaClWAlWAlWgpVgJVgJ
+VoKVYCVYCVaClWAlWAlWgpVgJVgJVoKVYCVYCVaClWAlWAlWgpVgJVgJVhtqiwTEKTLXTgAAAABJ
+RU5ErkJggg==
+
+@@ ui-bg_glass_65_ffffff_1x400.png (base64)
+iVBORw0KGgoAAAANSUhEUgAAAAEAAAGQCAYAAABvWArbAAAAMElEQVQ4je3LIQ4AIBTD0O3f/8wr
+FgmKhMy8pKJKwkhSKeVbbGuAPU9f4PIopTxgAeS0DRtI4yK0AAAAAElFTkSuQmCC
+
+@@ ui-bg_glass_75_e6e6e6_1x400.png (base64)
+iVBORw0KGgoAAAANSUhEUgAAAAEAAAGQCAYAAABvWArbAAAANUlEQVQ4je3LMQoAIBADwb38/6t5
+wFXaWAiCtUiaYZvF9hBACOFbuntVVe11B0CSjjeE8BwThQIJ8dhEl0YAAAAASUVORK5CYII=
+
+@@ ui-bg_highlight-soft_75_cccccc_1x100.png (base64)
+iVBORw0KGgoAAAANSUhEUgAAAAEAAABkCAYAAABHLFpgAAAALElEQVQYlWN49OjRfyYGBgaGIUT8
+//8fSqBx0Yh///4RL8vAwAAVQ2MNOwIAl6g6KkOJwk8AAAAASUVORK5CYII=
 

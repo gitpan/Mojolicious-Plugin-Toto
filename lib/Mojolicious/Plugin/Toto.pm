@@ -47,7 +47,7 @@ Another row of tabs provides a way to change actions.
 
 The actions displayed depend on context -- the type of object, and
 whether or not an object is selected determine the list of actions
-that are displayed
+that are displayed.
 
 The toto menu data structure is used to generate default routes of
 the form controller/action, for each controller+action pair.
@@ -78,7 +78,7 @@ use Toto;
 use strict;
 use warnings;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 sub register {
     my ($self, $app, $conf) = @_;

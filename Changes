@@ -12,3 +12,9 @@ Revision history for Mojolicious-Plugin-Toto
 0.04   Rewrite to generate a set of default routes
        instead of using a detour.
 
+0.05   Thu Jun 23 14:52:41 EDT 2011
+       Themeswitcher, css improvements, template support 
+
+0.06   Fri Jun 24 15:23:45 EDT 2011
+       Made jquery images inline, improved examples
+
