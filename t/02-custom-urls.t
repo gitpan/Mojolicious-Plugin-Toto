@@ -22,13 +22,13 @@ $t->max_redirects(1);
 
 my @hrefs;
 $t->get_ok('/some/crazy/url')->status_is(200)->content_like(qr/hi there/i);
-$t->tx->res->dom->find("a[href]")->while(sub { push @hrefs, "$_[0]" } );
+$t->tx->res->dom->find("a[href]")->each(sub { push @hrefs, "$_[0]" } );
 
 $t->get_ok('/beer')->status_is(200);
 
 my @again;
 $t->get_ok('/some/crazy/url')->status_is(200)->content_like(qr/hi there/i);
-$t->tx->res->dom->find("a[href]")->while(sub { push @again, "$_[0]" } );
+$t->tx->res->dom->find("a[href]")->each(sub { push @again, "$_[0]" } );
 
 is_deeply(\@hrefs,\@again);
 
