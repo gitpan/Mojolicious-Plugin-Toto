@@ -74,11 +74,12 @@ http://www.beer.dotcloud.com
 package Mojolicious::Plugin::Toto;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::ByteStream qw/b/;
-use Toto;
+
+use Toto ();
 use strict;
 use warnings;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -184,6 +185,7 @@ sub register {
             $c->stash( instance => $c->model_class->new( key => $key ) );
         }
     );
+    $self;
 }
 
 1;
