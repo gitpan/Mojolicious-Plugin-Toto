@@ -1,0 +1,15 @@
+
+<h2><center><%= current_object %> <%= current_instance->key %></center></h2>
+<ul class="nav nav-tabs">
+    <li style='height:25px;'>&nbsp;</li>
+% for my $a (tabs) {
+    <li <%== $a eq current_tab() ? q[ class="active"] : '' %>>
+        <%= link_to "$toto_prefix/".current_object()."/$a/".current_instance->key => begin =%>
+            <%= $a =%>
+        <%= end =%>
+    </li>
+% }
+    <li style='height:25px;'>&nbsp;</li>
+</ul>
+
+

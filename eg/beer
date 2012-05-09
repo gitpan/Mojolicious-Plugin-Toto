@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+
+package Foo;
+use Mojo::Base 'Mojolicious::Controller';
+
+sub bar { shift->render_text("this is another controller (used by beer/list)"); }
+
+package main;
+
+use Mojolicious::Lite;
+use lib './lib';
+
+get '/beer/list' => { controller => "Foo", action => 'bar' } => 'beer/list';
+
+plugin 'toto' =>
+   menu => [
+       beer    => { one  => [qw/view edit pictures notes/],
+                    many => [qw/list create search browse/] },
+       brewery => { one  => [qw/view edit directions beers info/],
+                    many => [qw/phonelist mailing_list/] },
+       pub     => { one  => [qw/view info comments hours/],
+                    many => [qw/search map/] },
+   ],
+;
+
+
+app->start
+

@@ -4,7 +4,7 @@ use Test::More tests => 3;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-get '/hello' => sub { shift->render_text('hello') };
+get '/hello' => { layout => 'default' } => sub { shift->render_text('hello') };
 
 plugin 'toto' => menu => [
     thing => {

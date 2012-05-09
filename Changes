@@ -24,3 +24,6 @@ Revision history for Mojolicious-Plugin-Toto
 0.08   Wed Aug 24 11:45:47 EDT 2011
        Fix for Mojolicious::Lite API change (auto @ISA manipulation)
 
+0.09   Sun May  6 01:14:25 EDT 2012
+       use bootstrap for css instead of jquery
+

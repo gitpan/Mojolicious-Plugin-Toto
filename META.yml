@@ -5,8 +5,9 @@ author:
 build_requires:
   Test::More: 0
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,13 +16,12 @@ name: Mojolicious-Plugin-Toto
 provides:
   Mojolicious::Plugin::Toto:
     file: lib/Mojolicious/Plugin/Toto.pm
-    version: 0.08
-  Toto:
-    file: lib/Toto.pm
-  Toto::Model:
-    file: lib/Toto/Model.pm
+    version: 0.09
+  Mojolicious::Plugin::Toto::Model:
+    file: lib/Mojolicious/Plugin/Toto/Model.pm
+    version: 0
 requires:
   Mojolicious: 1.46
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.08
+version: 0.09

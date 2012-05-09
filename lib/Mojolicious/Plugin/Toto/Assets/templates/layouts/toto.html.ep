@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+<head>
+<title><%= title %></title>
+%= base_tag
+%= stylesheet '/bootstrap/css/bootstrap.min.css';
+%= javascript '/bootstrap/js/bootstrap.min.js';
+<style>
+pre.toto_code {
+    float:right;
+    right:10%;
+    padding:5px;
+    border:1px grey dashed;
+    font-family:monospace;
+    position:absolute;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <ul class="nav nav-tabs">
+        <li style='width:100px;'>&nbsp;</li>
+% for my $c (objects) {
+        <li <%== $c eq current_object() ? q[ class="active"] : "" =%>>
+            <%= link_to $c => begin =%><%= $c =%><%= end =%>
+        </li>
+% }
+    </ul>
+    <div class="tabbable tabs-left">
+% if (stash 'key') {
+%= include 'top_tabs_single';
+% } else {
+%= include 'top_tabs_plural';
+% }
+         <div class="tab-content" style='width:auto;'>
+         <%= content =%>
+         </div>
+    </div>
+</div>
+</html>
+
