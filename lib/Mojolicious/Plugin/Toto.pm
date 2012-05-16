@@ -195,7 +195,7 @@ use Cwd qw/abs_path/;
 use strict;
 use warnings;
 
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 
 sub _render_static {
     my $c = shift;
@@ -222,20 +222,21 @@ sub _add_sidebar {
     die "no tab for $object" unless $tab;
     die "no nav item" unless $nav_item;
 
-    my @found_template = (
-        ( map { glob "$_/$tab.*" } @{ $app->renderer->paths } ),
-        ( map { glob "$_/$object/$tab.*" } @{ $app->renderer->paths } ),
+    my ($template) = (
+        ( map { (glob "$_/$object/$tab.*") ? "$object/$tab" : () } @{ $app->renderer->paths } ),
+        ( map { (glob "$_/$tab.*"        ) ? "$tab"         : () } @{ $app->renderer->paths } ),
     );
 
     my $found_controller = _cando($app->routes->namespace,$object,$tab);
 
     $app->log->debug("Adding sidebar route for $prefix/$object/$tab");
-    $app->log->debug("nav item: $nav_item, template: @found_template, controller? ".($found_controller // 'no') );
+    $app->log->debug("found template $template for $object/$tab ($nav_item)") if $template;
+    $app->log->debug("found controller for $object/$tab") if $found_controller;
 
     my $r = $app->routes->under(
         "$prefix/$object/$tab" => sub {
             my $c = shift;
-            $c->stash(template => ( @found_template ? $tab : "plural" ));
+            $c->stash(template => ( $template || "plural" ));
             $c->stash(object     => $object);
             $c->stash(noun       => $object);
             $c->stash(tab        => $tab);

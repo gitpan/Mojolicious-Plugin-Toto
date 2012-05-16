@@ -31,3 +31,9 @@ Revision history for Mojolicious-Plugin-Toto
        use nav bar instead of tabs
        use bridges to set stash variables
        various css changes
+
+0.11   Tue May 15 11:30:05 EDT 2012
+       nav, sidenav, tabs (bootstrap fluid)
+
+0.12   Wed May 16 11:30:55 EDT 2012
+       bugfix for finding templates
