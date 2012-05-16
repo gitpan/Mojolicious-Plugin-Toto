@@ -195,7 +195,7 @@ use Cwd qw/abs_path/;
 use strict;
 use warnings;
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 sub _render_static {
     my $c = shift;
@@ -358,7 +358,7 @@ sub register {
                     my $c = shift;
                     my $key = $c->stash("key");
                     $c->redirect_to("$object/$first_tab/$key");
-                    } => "$object/default ");
+                    } => "$object/default");
             }
         }
         die "Could not find first route for nav item '$nav_item' : all entries have tabs\n" unless $first;

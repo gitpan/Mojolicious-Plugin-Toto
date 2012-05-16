@@ -1,3 +1,5 @@
+% use Mojo::ByteStream qw/b/;
+
 This is the page for <%= $tab %> for
 <%= $object %> <%= $key %>.
 <pre class="toto_code">

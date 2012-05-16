@@ -20,6 +20,7 @@ use lib './lib';
 get '/beer/list' => { controller => "Foo", action => 'bar', nav_item => 'beverage' } => 'beer/list';
 
 plugin 'toto' =>
+  prefix => 't',
   nav => [
       'brewpub',          # Refers to a sidebar entry below
       'beverage'          # Refers to a sidebar entry below
