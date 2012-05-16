@@ -1,0 +1,30 @@
+<ul class="nav nav-list">
+
+% my $n = stash 'nav_item';
+% my @selected;
+% for my $a (@{ toto_config->{sidebar}{$n} } ) {
+    % if ($a !~ /\//) {
+    % push @selected, $a;
+    % next;
+    % }
+    <li <%== $a eq current_route() ? q[ class="active"] : '' %>>
+        <%= link_to $a => begin =%>
+            <%= $a =%>
+        <%= end =%>
+    </li>
+% }
+% for my $s (@selected) {
+% my $is_selected = ((stash 'key') && (stash 'object') && ( (stash 'object') eq $s));
+    <li style='white-space:nowrap;'>
+    <a <%== $is_selected ? q[style='color:black;'] : q[style='color:grey;'] %> href="javascript:void(0)">
+        selected <%= $s %>
+        % if ($is_selected) {
+            <span stlye='float:right;'><i class="icon-chevron-right"></i></span>
+        % }
+    </a>
+    </li>
+% }
+
+</ul>
+
+

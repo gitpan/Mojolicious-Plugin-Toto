@@ -1,6 +1,5 @@
-#!perl
+#!/usr/bin/env perl
 
-use Test::More tests => 9;
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -18,18 +17,9 @@ plugin 'toto' => nav => [qw/this that theother/],
     five => [qw/f g h/],
     seven  => [qw/i j k/],
   },
-;
+  ;
 
-my $t = Test::Mojo->new();
-
-$t->get_ok('/hello')->status_is(200)->content_is('hello');
-
-$t->get_ok('/')->status_is(302);
-
-$t->get_ok('/this')->status_is(302);
-
-$t->get_ok('/five/f/1')->status_is(200);
+app->start;
 
 1;
-
 

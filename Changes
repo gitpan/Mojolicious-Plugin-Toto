@@ -27,3 +27,7 @@ Revision history for Mojolicious-Plugin-Toto
 0.09   Sun May  6 01:14:25 EDT 2012
        use bootstrap for css instead of jquery
 
+0.10   Fri May 11 16:23:51 EDT 2012
+       use nav bar instead of tabs
+       use bridges to set stash variables
+       various css changes

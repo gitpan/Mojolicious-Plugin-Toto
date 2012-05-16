@@ -1,10 +1,16 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- http://twitter.github.com/bootstrap/examples/fluid.html -->
 <title><%= title %></title>
 %= base_tag
-%= stylesheet '/bootstrap/css/bootstrap.min.css';
+%= javascript '/js/jquery.js';
 %= javascript '/bootstrap/js/bootstrap.min.js';
+% if (my $css = stash 'css') {
+%= stylesheet $css;
+% }
+%= stylesheet '/bootstrap/css/bootstrap.min.css';
 <style>
 pre.toto_code {
     float:right;
@@ -14,28 +20,49 @@ pre.toto_code {
     font-family:monospace;
     position:absolute;
     }
+    .sidebar-nav {
+        padding: 9px 0;
+    }
 </style>
 </head>
-<body>
-<div class="container">
-    <ul class="nav nav-tabs">
-        <li style='width:100px;'>&nbsp;</li>
-% for my $c (objects) {
-        <li <%== $c eq current_object() ? q[ class="active"] : "" =%>>
-            <%= link_to $c => begin =%><%= $c =%><%= end =%>
-        </li>
-% }
-    </ul>
-    <div class="tabbable tabs-left">
-% if (stash 'key') {
-%= include 'top_tabs_single';
-% } else {
-%= include 'top_tabs_plural';
-% }
-         <div class="tab-content" style='width:auto;'>
-         <%= content =%>
-         </div>
-    </div>
-</div>
+<body style='padding-top:45px;'>
+        <div class="navbar navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container-fluid">
+                    <ul class="nav">
+                        % for my $c (@{ toto_config->{nav} }) {
+                        <li <%== $c eq ( ( stash 'nav_item' ) || '') ? q[class="active"] : "" %>>
+                            <%= link_to $c => begin =%><%= printable($c) =%><%= end =%>
+                        </li>
+                        % }
+                    </ul>
+                  % if (stash 'brand') {
+                        <%= stash 'brand' %>
+                  % }
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row-fluid">
+                % if (stash 'nav_item') {
+                <div class="span2">
+                    <div class="well sidebar-nav">
+                        %= include 'toto/sidebar';
+                    </div>
+                </div>
+                <div class="span10">
+                % } else {
+                <div class="span12">
+                % }
+
+                    % if (stash 'key') {
+                    %= include 'toto/tabs';
+                    % }
+                    <div class="container-fluid">
+                             <%= content =%>
+                    </div>
+                </div>
+            </div>
+        </div>
 </html>
 

@@ -5,7 +5,7 @@ WriteMakefile
   'NAME' => 'Mojolicious::Plugin::Toto',
   'VERSION_FROM' => 'lib/Mojolicious/Plugin/Toto.pm',
   'PREREQ_PM' => {
-                   'Mojolicious' => '1.46',
+                   'Mojolicious' => '2.92',
                    'Test::More' => 0
                  },
   'INSTALLDIRS' => 'site',
