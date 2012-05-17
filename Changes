@@ -42,3 +42,6 @@ Revision history for Mojolicious-Plugin-Toto
        minor bug in default single template
        sidebar tweaks
 
+0.14   Thu May 17 10:47:19 EDT 2012
+       Added head_route param.
+

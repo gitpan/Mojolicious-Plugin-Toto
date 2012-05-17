@@ -75,6 +75,12 @@ In addition to "menu", "nav/sidebar/tabs", the following options are recognized 
 
 A prefix to prepend to the path for the toto routes.
 
+=item head_route
+
+    head_route => $app->routes->find('top_route");
+
+A Mojolicious::Route::Route object to use as the parent for all routes.
+
 =item model_namespace
 
     model_namespace => "Myapp::Model'
@@ -195,7 +201,7 @@ use Cwd qw/abs_path/;
 use strict;
 use warnings;
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 sub _render_static {
     my $c = shift;
@@ -218,6 +224,7 @@ sub _to_noun {
 sub _add_sidebar {
     my $self = shift;
     my $app = shift;
+    my $routes = shift;
     my ($prefix, $nav_item, $object, $tab) = @_;
     die "no tab for $object" unless $tab;
     die "no nav item" unless $nav_item;
@@ -227,13 +234,14 @@ sub _add_sidebar {
         ( map { (glob "$_/$tab.*"        ) ? "$tab"         : () } @{ $app->renderer->paths } ),
     );
 
-    my $found_controller = _cando($app->routes->namespace,$object,$tab);
+    my $namespace = $routes->can('namespace') ? $routes->namespace : $routes->root->namespace;
+    my $found_controller = _cando($namespace,$object,$tab);
 
     $app->log->debug("Adding sidebar route for $prefix/$object/$tab");
     $app->log->debug("found template $template for $object/$tab ($nav_item)") if $template;
     $app->log->debug("found controller for $object/$tab") if $found_controller;
 
-    my $r = $app->routes->under(
+    my $r = $routes->under(
         "$prefix/$object/$tab" => sub {
             my $c = shift;
             $c->stash(template => ( $template || "plural" ));
@@ -249,14 +257,16 @@ sub _add_sidebar {
 sub _add_tab {
     my $self = shift;
     my $app = shift;
+    my $routes = shift;
     my ($prefix, $nav_item, $object, $tab) = @_;
     my @found_object_template = map { glob "$_/$object/$tab.*" } @{ $app->renderer->paths };
     my @found_template = map { glob "$_/$tab.*" } @{ $app->renderer->paths };
-    my $found_controller = _cando($app->routes->namespace,$object,$tab);
+    my $namespace = $routes->can('namespace') ? $routes->namespace : $routes->root->namespace;
+    my $found_controller = _cando($namespace,$object,$tab);
     $app->log->debug("Adding route for $prefix/$object/$tab/*key");
     $app->log->debug("Found controller class for $object/$tab/key") if $found_controller;
     $app->log->debug("Found template for $object/$tab/key") if @found_template || @found_object_template;
-    my $r = $app->routes->under("$prefix/$object/$tab/(*key)"  =>
+    my $r = $routes->under("$prefix/$object/$tab/(*key)"  =>
             sub {
                 my $c = shift;
                 $c->stash(object => $object);
@@ -322,6 +332,7 @@ sub register {
     my ($nav,$sidebar,$tabs) = @$conf{qw/nav sidebar tabs/};
 
     my $prefix = $conf->{prefix} || '';
+    my $routes = $conf->{head_route} || $app->routes;
 
     my $base = catdir(abs_path(dirname(__FILE__)), qw/Toto Assets/);
     my $default_path = catdir($base,'templates');
@@ -343,7 +354,7 @@ sub register {
             my ( $object, $action ) = split '/', $subnav_item;
             if ($action) {
                 $first ||= $subnav_item;
-                $self->_add_sidebar($app,$prefix,$nav_item,$object,$action);
+                $self->_add_sidebar($app,$routes,$prefix,$nav_item,$object,$action);
             } else {
                 my $first_tab;
                 my $tabs = $tabs->{$subnav_item} or
@@ -351,10 +362,10 @@ sub register {
                 die "tab row for '$subnav_item' appears more than once" if $tab_done{$subnav_item}++;
                 for my $tab (@$tabs) {
                     $first_tab ||= $tab;
-                    $self->_add_tab($app,$prefix,$nav_item,$object,$tab);
+                    $self->_add_tab($app,$routes,$prefix,$nav_item,$object,$tab);
                 }
                 $app->log->debug("Will redirect $prefix/$object/default/key to $object/$first_tab/\$key");
-                $app->routes->get("$prefix/$object/default/*key" => sub {
+                $routes->get("$prefix/$object/default/*key" => sub {
                     my $c = shift;
                     my $key = $c->stash("key");
                     $c->redirect_to("$object/$first_tab/$key");
@@ -362,7 +373,7 @@ sub register {
             }
         }
         die "Could not find first route for nav item '$nav_item' : all entries have tabs\n" unless $first;
-        $app->routes->get(
+        $routes->get(
             $nav_item => sub {
                 my $c = shift;
                 $c->redirect_to($first);
@@ -370,7 +381,7 @@ sub register {
     }
 
     my $first_object = $conf->{nav}[0];
-    $app->routes->get("$prefix/" => sub { shift->redirect_to($first_object) } );
+    $routes->get("$prefix/" => sub { shift->redirect_to($first_object) } );
 
     for ($app) {
         $_->helper( toto_config => sub { $conf } );
