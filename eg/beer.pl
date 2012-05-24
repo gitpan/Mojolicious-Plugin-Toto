@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
- 
+
 package Beer;
 use Mojo::Base 'Mojolicious::Controller';
 
@@ -21,6 +21,7 @@ get '/beer/list' => { controller => "Foo", action => 'bar', nav_item => 'beverag
 
 plugin 'toto' =>
   prefix => 't',
+  #model_namespace => 'Mojolicious::Plugin::Toto',
   nav => [
       'brewpub',          # Refers to a sidebar entry below
       'beverage'          # Refers to a sidebar entry below

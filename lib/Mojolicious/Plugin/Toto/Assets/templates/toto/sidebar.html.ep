@@ -4,14 +4,22 @@
 % my @selected;
 % for my $a (@{ toto_config->{sidebar}{$n} } ) {
     % if ($a !~ /\//) {
-        % my $is_selected = ((stash 'key') && (stash 'object') && ( (stash 'object') eq $a));
-        <li>
-        <a <%== $is_selected ? q[style='color:black;'] : q[style='color:grey;'] %> href="javascript:void(0)">
+        % my $is_selected = (current_object eq $a) && ((stash 'show_tabs') || (stash 'key'));
+        <li class="dropdown <%== $is_selected ? q[ active] : '' %>" id="this_<%= $a %>">
+            <a class="dropdown-toggle" style='float:right;z-index:10000' data-toggle="dropdown" href="#this_<%= $a %>">
+                <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+                % for my $t (tabs($a)) {
+                <li>
+                 %= link_to "$a/$t" => { key => "" } => begin
+                 <%= $t %>
+                 %= end
+                </li>
+                % }
+            </ul>
+        <%= link_to "$a/default" => { key => "" } => begin =%>
             <%= $a %>
-            % if ($is_selected) {
-                <span stlye='float:right;'><i class="icon-chevron-right"></i></span>
-            % }
-        </a>
+        <%= end =%>
         </li>
     % next;
     % }

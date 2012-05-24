@@ -13,9 +13,12 @@ lib/Mojolicious/Plugin/Toto/Assets/public/bootstrap/css/bootstrap.css
 lib/Mojolicious/Plugin/Toto/Assets/public/bootstrap/css/bootstrap.min.css
 lib/Mojolicious/Plugin/Toto/Assets/public/bootstrap/img/glyphicons-halflings-white.png
 lib/Mojolicious/Plugin/Toto/Assets/public/bootstrap/img/glyphicons-halflings.png
-lib/Mojolicious/Plugin/Toto/Assets/public/bootstrap/js/bootstrap.js
+lib/Mojolicious/Plugin/Toto/Assets/public/bootstrap/js/application.js
+lib/Mojolicious/Plugin/Toto/Assets/public/bootstrap/js/bootstrap-dropdown.js
+lib/Mojolicious/Plugin/Toto/Assets/public/bootstrap/js/bootstrap-typeahead.js
 lib/Mojolicious/Plugin/Toto/Assets/public/bootstrap/js/bootstrap.min.js
 lib/Mojolicious/Plugin/Toto/Assets/templates/layouts/toto.html.ep
+lib/Mojolicious/Plugin/Toto/Assets/templates/none_selected.html.ep
 lib/Mojolicious/Plugin/Toto/Assets/templates/plural.html.ep
 lib/Mojolicious/Plugin/Toto/Assets/templates/single.html.ep
 lib/Mojolicious/Plugin/Toto/Assets/templates/toto.html.ep

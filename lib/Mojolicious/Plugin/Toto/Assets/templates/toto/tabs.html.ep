@@ -1,10 +1,27 @@
 
-<h2><center><%= ucfirst(printable(current_object)) %> :  <%= current_instance->key %></center></h2>
+<h3>
+    <center>
+% if (stash 'key') {
+<div class="row-fluid">
+<%= link_to current_object()."/".current_tab, { key => "" } => class => "close" => begin =%>
+&times;
+%= end
+        <%= ucfirst(printable(current_object)) %> :  <%= stash 'key' %>
+</div>
+% } else {
+<div class="row-fluid" style='color:grey;'>
+        <%= ucfirst(printable(current_object)) %> : <i>none</i>
+</div>
+% }
+    </center>
+</h3>
+
+
 <ul class="nav nav-tabs">
     <li style='height:25px;'>&nbsp;</li>
 % for my $a (tabs) {
     <li <%== $a eq current_tab() ? q[ class="active"] : '' %>>
-        <%= link_to "$toto_prefix/".current_object()."/$a/".current_instance->key => begin =%>
+        <%= link_to "$toto_prefix/".current_object()."/$a/".(current_instance->key || '') => begin =%>
             <%= $a =%>
         <%= end =%>
     </li>
