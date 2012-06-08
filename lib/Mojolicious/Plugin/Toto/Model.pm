@@ -2,6 +2,10 @@ package Mojolicious::Plugin::Toto::Model;
 use Mojo::Base -base;
 has 'key';
 
+use overload '""' => sub {
+    shift->key;
+};
+
 sub autocomplete {
     my $class  = shift;
     my %args   = @_;

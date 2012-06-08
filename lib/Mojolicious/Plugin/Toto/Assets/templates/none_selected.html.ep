@@ -66,9 +66,12 @@ div.myac ul li > a:hover {
 %= javascript begin
 $('#ta').typeahead({
     source : function () {
-        $.get( "<%= url_for("$object/autocomplete") %>?q=" + encodeURIComponent($("#ta").val()),
-                [],
-                function(data,textStatus,jqXHR) {
+        $.get( "<%= url_for("$object/autocomplete") %>?q="
+                + encodeURIComponent($("#ta").val())
+                + "&tab="
+                + encodeURIComponent("<%= current_tab =%>")
+             , []
+             , function(data,textStatus,jqXHR) {
                     $("#searchq").html($("#ta").val());
                     var out = '<ul>';
                     $.each(data, function ( i, v ) {

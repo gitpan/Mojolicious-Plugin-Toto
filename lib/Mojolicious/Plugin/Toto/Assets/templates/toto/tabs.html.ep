@@ -3,10 +3,11 @@
     <center>
 % if (stash 'key') {
 <div class="row-fluid">
-<%= link_to current_object()."/".current_tab, { key => "" } => class => "close" => begin =%>
-&times;
-%= end
-        <%= ucfirst(printable(current_object)) %> :  <%= stash 'key' %>
+        <%= current_instance %>
+<% my $custom = begin %><%= include current_object.'/change_button' =%><% end %>
+<% my $generic = begin %><%= include 'change_button'; =%><% end %>
+%= $custom->() || $generic->();
+
 </div>
 % } else {
 <div class="row-fluid" style='color:grey;'>

@@ -30,7 +30,7 @@ of routes for a Mojolicious or Mojolicious::Lite app
 The navigational structure is a slight variation of this
 example used by twitter's bootstrap :
 
-    http://twitter.github.com/bootstrap/examples/fluid.html
+    L<http://twitter.github.com/bootstrap/examples/fluid.html>
 
 The plugin provides a sidebar, a nav bar, and also a
 row of tabs underneath the name of an object.
@@ -54,13 +54,28 @@ Defaults routes are generated for every sidebar entry and tab entry.
 The names of the routes are of the form "controller/action", where
 controller is both the controller class and the model class.
 
-Templates in the directory templates/<controller>/<action>.html.ep will be used when
-they exist.
+The following templates will be automagically used, if found
+(in order of preference) :
+
+  - templates/<controller>/<instance>/<action>.html.ep
+  - templates/<controller>/<action>.html.ep
+  - templates/<action>.html.ep
+
+Or if no object is selected :
+
+  - templates/<controller>/none_selected.html.ep
+
+(This one links connects to "list" and "search" if
+these routes exist, and provides an autocomplete
+form if the model class has an autocomplete() method.)
+
+Also the templates "single" and "plural" are built-in
+fallbacks for the two cases described above.
 
 The stash values "object" and "tab" are set for each auto-generated route.
 Also "noun" is set as an alias to "object".
 
-A version of twitter's bootstrap (<http://twitter.github.com/bootstrap>) is
+A version of twitter's L<bootstrap|http://twitter.github.com/bootstrap> is
 included in this distribution.
 
 =head1 OPTIONS
@@ -179,14 +194,18 @@ something other than "toto', e.g.
 
 This module is experimental.  The API may change without notice.  Feedback is welcome!
 
+=head1 TODO
+
+Document the autcomplete API.
+
 =head1 AUTHOR
 
 Brian Duggan C<bduggan@matatu.org>
 
 =head1 SEE ALSO
 
-http://twitter.github.com/bootstrap/examples/fluid.html
-http://www.beer.dotcloud.com
+ L<http://twitter.github.com/bootstrap/examples/fluid.html>
+ L<http://www.beer.dotcloud.com>
 
 =cut
 
@@ -201,7 +220,7 @@ use Cwd qw/abs_path/;
 use strict;
 use warnings;
 
-our $VERSION = 0.15;
+our $VERSION = 0.17;
 
 sub _render_static {
     my $c = shift;
@@ -230,8 +249,8 @@ sub _add_sidebar {
     die "no nav item" unless $nav_item;
 
     my ($template) = (
-        ( map { (glob "$_/$object/$tab.*") ? "$object/$tab" : () } @{ $app->renderer->paths } ),
-        ( map { (glob "$_/$tab.*"        ) ? "$tab"         : () } @{ $app->renderer->paths } ),
+        ( map { (-e "$_/$object/$tab.html.ep") ? "$object/$tab" : () } @{ $app->renderer->paths } ),
+        ( map { (-e "$_/$tab.html.ep"        ) ? "$tab"         : () } @{ $app->renderer->paths } ),
     );
 
     my $namespace = $routes->can('namespace') ? $routes->namespace : $routes->root->namespace;
@@ -260,8 +279,8 @@ sub _add_tab {
     my $routes = shift;
     my ($prefix, $nav_item, $object, $tab) = @_;
     my ($default_template) = (
-        ( map { (glob "$_/$object/$tab.*") ? "$object/$tab" : () } @{ $app->renderer->paths } ),
-        ( map { (glob "$_/$tab.*"        ) ? "$tab"         : () } @{ $app->renderer->paths } ),
+        ( map { (-e "$_/$object/$tab.html.ep") ? "$object/$tab" : () } @{ $app->renderer->paths } ),
+        ( map { (-e "$_/$tab.html.ep"        ) ? "$tab"         : () } @{ $app->renderer->paths } ),
     );
     my $namespace = $routes->can('namespace') ? $routes->namespace : $routes->root->namespace;
     my $found_controller = _cando($namespace,$object,$tab);
@@ -277,12 +296,10 @@ sub _add_tab {
                 $c->stash(noun => _to_noun($object));
                 $c->stash(tab => $tab);
                 if (my $key = lc $c->stash('key')) {
-                    my @found = map { glob "$_/$object/$key/$tab.*" } @{ $app->renderer->paths };
-                    $template = "$object/$key/$tab" if @found;
+                    $template = "$object/$key/$tab" if grep { -e "$_/$object/$key/$tab.html.ep" } @{ $app->renderer->paths };
                 } else {
                     $template = "none_selected";
-                    my @found =  map { glob "$_/$object/none_selected.*" } @{ $app->renderer->paths };
-                    $template = "$object/none_selected" if @found;
+                    $template = "$object/none_selected" if grep { -e "$_/$object/none_selected.html.ep" } @{ $app->renderer->paths };
                 }
                 $c->stash( template => $template || "single");
                 my $instance = $c->current_instance;

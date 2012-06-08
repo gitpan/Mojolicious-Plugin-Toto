@@ -11,8 +11,8 @@
 %= javascript '/bootstrap/js/bootstrap.min.js';
 %= javascript '/bootstrap/js/bootstrap-typeahead.js';
 %= javascript '/bootstrap/js/application.js';
-% if (my $css = stash 'css') {
-%= stylesheet $css;
+% if (my $head = stash 'head') {
+%= $head
 % }
 %= stylesheet '/bootstrap/css/bootstrap.min.css';
 <style>
