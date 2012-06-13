@@ -12,10 +12,11 @@ sub autocomplete {
     my $q      = $args{q} or return;
     my $object = $args{object};
     my $c      = $args{c};
+    my $tab    = $args{tab} || 'default';
     return [
         map +{
             name => "$object $_",
-            href => $c->url_for("$object/default", key => $_),
+            href => $c->url_for("$object/$tab", key => $_),
         }, 1..10
     ];
 }

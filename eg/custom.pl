@@ -14,18 +14,19 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 my $menu = [
-    beer => {
+    city => {
         many => [qw/search browse/],
         one  => [qw/ingredients/],
     },
     house => {
-        many => [qw/list/]
+        many => [qw/list/],
+        one  => [qw/pictures address color/],
     }
 ];
 
-get '/some/crazy/url' => sub { shift->render_text("hi there"); } => { nav_item => 'beer' } => "beer/search";
+get '/some/crazy/url' => sub { shift->render_text("hi there"); } => { nav_item => 'city' } => "city/search";
 
-get '/beer/browse' => sub { shift->render_text("my name is inigo montoya") } =>{ nav_item => 'beer' } =>  "beer/browse";
+get '/city/browse' => sub { shift->render_text("my name is inigo montoya") } =>{ nav_item => 'city' } =>  "city/browse";
 
 get '/house/list' => { controller => 'house', action => 'list', nav_item => 'house' } =>  'house/list';
 

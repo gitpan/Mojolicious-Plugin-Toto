@@ -19,6 +19,8 @@ use lib './lib';
 
 get '/beer/list' => { controller => "Foo", action => 'bar', nav_item => 'beverage' } => 'beer/list';
 
+get '/' => 'index';
+
 plugin 'toto' =>
   prefix => 't',
   #model_namespace => 'Mojolicious::Plugin::Toto',
@@ -51,5 +53,12 @@ plugin 'toto' =>
 
 app->start;
 
+__DATA__
+@@ index.html.ep
+
+This is the landing page, all the toto stuff is
+%= link_to 'brewpub' => begin
+here
+%= end
 
 

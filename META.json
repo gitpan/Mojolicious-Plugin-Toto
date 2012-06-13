@@ -4,7 +4,7 @@
       "Brian Duggan <bduggan@matatu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.112150",
    "license" : [
       "perl_5"
    ],
@@ -21,7 +21,7 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build" : "0.4"
          }
       },
       "runtime" : {
@@ -33,7 +33,7 @@
    "provides" : {
       "Mojolicious::Plugin::Toto" : {
          "file" : "lib/Mojolicious/Plugin/Toto.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "Mojolicious::Plugin::Toto::Model" : {
          "file" : "lib/Mojolicious/Plugin/Toto/Model.pm",
@@ -46,5 +46,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.17"
+   "version" : "0.18"
 }

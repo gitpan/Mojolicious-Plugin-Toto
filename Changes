@@ -57,3 +57,9 @@ Revision history for Mojolicious-Plugin-Toto
        - stringification of objects
        - support object-specific change_button
 
+0.18   Wed Jun 13 10:09:18 EDT 2012
+       - Fixed up examples and pod
+       - Fixed tab selection in autocomplete
+       - included change_button template
+       - other minor html fixes
+
