@@ -6,6 +6,7 @@ eg/custom.pl
 eg/from_pod.pl
 eg/litte.pl
 eg/random.pl
+eg/toto.pl
 ignore.txt
 lib/Mojolicious/Plugin/Toto.pm
 lib/Mojolicious/Plugin/Toto/Assets/public/bootstrap/css/bootstrap-responsive.css

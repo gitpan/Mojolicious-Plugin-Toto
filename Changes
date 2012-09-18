@@ -63,3 +63,6 @@ Revision history for Mojolicious-Plugin-Toto
        - included change_button template
        - other minor html fixes
 
+0.19   Tue Sep 18 14:16:11 EDT 2012
+       - do not route to tabs when key is missing
+       - support templates in DATA section

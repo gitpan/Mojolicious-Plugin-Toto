@@ -28,10 +28,9 @@ Mojolicious::Plugin::Toto - A simple tab and object based site structure
 This plugin provides a navigational structure and a default set
 of routes for a Mojolicious or Mojolicious::Lite app
 
-The navigational structure is a slight variation of this
-example used by twitter's bootstrap :
-
-    L<http://twitter.github.com/bootstrap/examples/fluid.html>
+The navigational structure is a slight variation of
+L<this|http://twitter.github.com/bootstrap/examples/fluid.html>
+example used by twitter's L<bootstrap|http://twitter.github.com/bootstrap>.
 
 The plugin provides a sidebar, a nav bar, and also a
 row of tabs underneath the name of an object.
@@ -213,8 +212,7 @@ Brian Duggan C<bduggan@matatu.org>
 
 =head1 SEE ALSO
 
- L<http://twitter.github.com/bootstrap/examples/fluid.html>
- L<http://www.beer.dotcloud.com>
+L<beer.dotcloud.com|http://www.beer.dotcloud.com>
 
 =cut
 
@@ -229,7 +227,7 @@ use Cwd qw/abs_path/;
 use strict;
 use warnings;
 
-our $VERSION = 0.18;
+our $VERSION = 0.19;
 
 sub _render_static {
     my $c = shift;
@@ -261,6 +259,8 @@ sub _add_sidebar {
         ( map { (-e "$_/$object/$tab.html.ep") ? "$object/$tab" : () } @{ $app->renderer->paths } ),
         ( map { (-e "$_/$tab.html.ep"        ) ? "$tab"         : () } @{ $app->renderer->paths } ),
     );
+    $template = $tab if $app->renderer->get_data_template({},"$tab.html.ep");
+    $template = "$object/$tab" if $app->renderer->get_data_template({}, "$object/$tab.html.ep");
 
     my $namespace = $routes->can('namespace') ? $routes->namespace : $routes->root->namespace;
     my $found_controller = _cando($namespace,$object,$tab);
@@ -272,7 +272,7 @@ sub _add_sidebar {
     my $r = $routes->under(
         "$prefix/$object/$tab" => sub {
             my $c = shift;
-            $c->stash(template => ( $template || "plural" ));
+            $c->stash->{template} = $template || "plural";
             $c->stash(object     => $object);
             $c->stash(noun       => $object);
             $c->stash(tab        => $tab);
@@ -291,6 +291,9 @@ sub _add_tab {
         ( map { (-e "$_/$object/$tab.html.ep") ? "$object/$tab" : () } @{ $app->renderer->paths } ),
         ( map { (-e "$_/$tab.html.ep"        ) ? "$tab"         : () } @{ $app->renderer->paths } ),
     );
+    $default_template = $tab if $app->renderer->get_data_template({}, "$tab.html.ep");
+    $default_template = "$object/$tab" if $app->renderer->get_data_template({}, "$object/$tab.html.ep");
+
     my $namespace = $routes->can('namespace') ? $routes->namespace : $routes->root->namespace;
     my $found_controller = _cando($namespace,$object,$tab);
     $app->log->debug("Adding route for $prefix/$object/$tab/*key");
@@ -301,21 +304,29 @@ sub _add_tab {
             => sub {
                 my $c = shift;
                 my $template = $default_template;
+                my $key = lc $c->stash('key');
                 $c->stash(object => $object);
                 $c->stash(noun => _to_noun($object));
                 $c->stash(tab => $tab);
-                if (my $key = lc $c->stash('key')) {
-                    $template = "$object/$key/$tab" if grep { -e "$_/$object/$key/$tab.html.ep" } @{ $app->renderer->paths };
+                if ( $key ) {
+                    if ( ( grep { -e "$_/$object/$key/$tab.html.ep" }
+                            @{ $app->renderer->paths }
+                        )
+                        || $c->app->renderer->get_data_template( {},
+                            "$object/$key/$tab.html.ep" )) {
+                        $template = "$object/$key/$tab";
+                    }
                 } else {
                     $template = "none_selected";
                     $template = "$object/none_selected" if grep { -e "$_/$object/none_selected.html.ep" } @{ $app->renderer->paths };
                 }
-                $c->stash( template => $template || "single");
+                $c->stash->{template} = $template || "single";
                 my $instance = $c->current_instance;
                 $c->stash( instance => $instance );
                 $c->stash( nav_item => $nav_item );
                 $c->stash( $object  => $instance );
-                1;
+                $c->render unless $key;
+                $key ? 1 : 0;
               }
             )->any;
       $r = $r->to("$object#$tab") if $found_controller;
