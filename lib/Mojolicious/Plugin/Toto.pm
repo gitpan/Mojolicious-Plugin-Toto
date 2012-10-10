@@ -227,7 +227,7 @@ use Cwd qw/abs_path/;
 use strict;
 use warnings;
 
-our $VERSION = 0.19;
+our $VERSION = "0.20";
 
 sub _render_static {
     my $c = shift;
@@ -259,8 +259,8 @@ sub _add_sidebar {
         ( map { (-e "$_/$object/$tab.html.ep") ? "$object/$tab" : () } @{ $app->renderer->paths } ),
         ( map { (-e "$_/$tab.html.ep"        ) ? "$tab"         : () } @{ $app->renderer->paths } ),
     );
-    $template = $tab if $app->renderer->get_data_template({},"$tab.html.ep");
-    $template = "$object/$tab" if $app->renderer->get_data_template({}, "$object/$tab.html.ep");
+    $template = $tab if $app->renderer->get_data_template({template => $tab, format => 'html', handler => 'ep'});
+    $template = "$object/$tab" if $app->renderer->get_data_template({template => "$object/$tab", format => "html", handler => "ep"});
 
     my $namespace = $routes->can('namespace') ? $routes->namespace : $routes->root->namespace;
     my $found_controller = _cando($namespace,$object,$tab);
@@ -291,8 +291,8 @@ sub _add_tab {
         ( map { (-e "$_/$object/$tab.html.ep") ? "$object/$tab" : () } @{ $app->renderer->paths } ),
         ( map { (-e "$_/$tab.html.ep"        ) ? "$tab"         : () } @{ $app->renderer->paths } ),
     );
-    $default_template = $tab if $app->renderer->get_data_template({}, "$tab.html.ep");
-    $default_template = "$object/$tab" if $app->renderer->get_data_template({}, "$object/$tab.html.ep");
+    $default_template = $tab if $app->renderer->get_data_template({template => $tab, format => "html", handler => "ep"});
+    $default_template = "$object/$tab" if $app->renderer->get_data_template({template => "$object/$tab", format => "html", handler => "ep"});
 
     my $namespace = $routes->can('namespace') ? $routes->namespace : $routes->root->namespace;
     my $found_controller = _cando($namespace,$object,$tab);
@@ -309,11 +309,8 @@ sub _add_tab {
                 $c->stash(noun => _to_noun($object));
                 $c->stash(tab => $tab);
                 if ( $key ) {
-                    if ( ( grep { -e "$_/$object/$key/$tab.html.ep" }
-                            @{ $app->renderer->paths }
-                        )
-                        || $c->app->renderer->get_data_template( {},
-                            "$object/$key/$tab.html.ep" )) {
+                    if ( ( grep { -e "$_/$object/$key/$tab.html.ep" } @{ $app->renderer->paths } )
+                        || $c->app->renderer->get_data_template( {template => "$object/$key/$tab", format => "html", handler => "ep"}) ) {
                         $template = "$object/$key/$tab";
                     }
                 } else {
