@@ -227,7 +227,7 @@ use Cwd qw/abs_path/;
 use strict;
 use warnings;
 
-our $VERSION = "0.20";
+our $VERSION = "0.21";
 
 sub _render_static {
     my $c = shift;

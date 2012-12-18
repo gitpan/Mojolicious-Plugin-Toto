@@ -6,7 +6,6 @@
 <title><%= title %></title>
 %= base_tag
 %= javascript '/bootstrap/js/bootstrap-dropdown.js';
-%# NB jquery must come after dropdown ?!
 %= javascript '/js/jquery.js';
 %= javascript '/bootstrap/js/bootstrap.min.js';
 %= javascript '/bootstrap/js/bootstrap-typeahead.js';
@@ -46,7 +45,6 @@ pre.toto_code {
                 </div>
             </div>
         </div>
-        <div class="container-fluid">
             <div class="row-fluid">
                 % if (stash 'nav_item') {
                 <div class="span2">
@@ -62,12 +60,9 @@ pre.toto_code {
                     % if ( (stash 'key') || (stash 'show_tabs') ) {
                     %= include 'toto/tabs';
                     % }
-                    <div class="container-fluid">
-                             <%= content =%>
-                    </div>
+                       <%= content =%>
                 </div>
             </div>
-        </div>
     </body>
 </html>
 
