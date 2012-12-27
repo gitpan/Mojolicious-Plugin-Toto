@@ -19,6 +19,7 @@ package MyApp;
 use Mojolicious::Lite;
 
 app->renderer->classes(['main']);
+app->routes->namespaces(['main']);
 
 plugin toto => {
     nav     => [qw/house/],
@@ -45,6 +46,7 @@ done_testing();
 
 __DATA__
 @@ not_found.html.ep
+% layout 'default';
 NOT FOUND : <%= $self->req->url->path %>
 
 @@ door/create.html.ep

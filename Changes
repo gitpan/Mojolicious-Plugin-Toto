@@ -1,6 +1,10 @@
 
 Revision history for Mojolicious-Plugin-Toto
 
+0.22   Thu Dec 27 10:50:05 PST 2012
+       - mojolicious 3.70 compatibility
+         (namespace -> namespaces)
+
 0.21   Tue Dec 18 05:32:32 PST 2012
        - layout changes
        - bootstrap 2.2.2

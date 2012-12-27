@@ -1,8 +1,8 @@
 % use Mojo::ByteStream qw/b/;
 <pre class="toto_code">
 get '/<%= $object %>/<%= $tab %>' => sub {
-% if ($self->app->routes->namespace) {
-    # or define <%= $self->app->routes->namespace %>::<%= b($object)->camelize %>::<%= $tab %>()
+% if ($self->app->routes->namespaces) {
+    # or define <%= $self->app->routes->namespaces->[0] %>::<%= b($object)->camelize %>::<%= $tab %>()
 % }
     ...
 } => '<%= $object %>/<%= $tab %>';

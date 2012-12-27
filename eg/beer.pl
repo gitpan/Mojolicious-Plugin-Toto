@@ -17,6 +17,8 @@ package main;
 use Mojolicious::Lite;
 use lib './lib';
 
+app->routes->namespaces(['main']);
+
 get '/beer/list' => { controller => "Foo", action => 'bar', nav_item => 'beverage' } => 'beer/list';
 
 get '/' => 'index';

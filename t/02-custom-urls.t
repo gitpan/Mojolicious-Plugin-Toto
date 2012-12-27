@@ -13,6 +13,8 @@ use Test::More;
 use Mojolicious::Lite;
 use Test::Mojo;
 
+app->routes->namespaces(['main']);
+
 my $menu = [
     beer => {
         many => [qw/search browse/],
@@ -57,5 +59,6 @@ done_testing();
 
 __DATA__
 @@ not_found.html.ep
+% layout 'default';
 NOT FOUND : <%= $self->req->url->path %>
 

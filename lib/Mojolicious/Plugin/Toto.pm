@@ -227,7 +227,7 @@ use Cwd qw/abs_path/;
 use strict;
 use warnings;
 
-our $VERSION = "0.21";
+our $VERSION = "0.22";
 
 sub _render_static {
     my $c = shift;
@@ -262,12 +262,12 @@ sub _add_sidebar {
     $template = $tab if $app->renderer->get_data_template({template => $tab, format => 'html', handler => 'ep'});
     $template = "$object/$tab" if $app->renderer->get_data_template({template => "$object/$tab", format => "html", handler => "ep"});
 
-    my $namespace = $routes->can('namespace') ? $routes->namespace : $routes->root->namespace;
-    my $found_controller = _cando($namespace,$object,$tab);
+    my $namespaces = $routes->can('namespaces') ? $routes->namespaces : $routes->root->namespaces;
+    $namespaces = [ '' ] unless $namespaces && @$namespaces;
+    my $found_controller = grep { _cando($_,$object,$tab) } @$namespaces;
 
     $app->log->debug("Adding sidebar route for $prefix/$object/$tab");
     $app->log->debug("found template $template for $object/$tab ($nav_item)") if $template;
-    $app->log->debug("found controller for $object/$tab") if $found_controller;
 
     my $r = $routes->under(
         "$prefix/$object/$tab" => sub {
@@ -278,7 +278,9 @@ sub _add_sidebar {
             $c->stash(tab        => $tab);
             $c->stash(nav_item   => $nav_item);
           })->any;
-    $r = $r->to("$object#$tab") if $found_controller;
+
+    $app->log->debug("found controller for $object/$tab (controller : $object, action : $tab)") if $found_controller;
+    $r = $r->to(controller => $object, action => $tab) if $found_controller;
     $r->name("$object/$tab");
 }
 
@@ -294,8 +296,9 @@ sub _add_tab {
     $default_template = $tab if $app->renderer->get_data_template({template => $tab, format => "html", handler => "ep"});
     $default_template = "$object/$tab" if $app->renderer->get_data_template({template => "$object/$tab", format => "html", handler => "ep"});
 
-    my $namespace = $routes->can('namespace') ? $routes->namespace : $routes->root->namespace;
-    my $found_controller = _cando($namespace,$object,$tab);
+    my $namespaces = $routes->can('namespaces') ? $routes->namespaces : $routes->root->namespaces;
+    $namespaces = [ '' ] unless $namespaces && @$namespaces;
+    my $found_controller = grep { _cando($_,$object,$tab) } @$namespaces;
     $app->log->debug("Adding route for $prefix/$object/$tab/*key");
     $app->log->debug("Found controller class for $object/$tab/key") if $found_controller;
     $app->log->debug("Found default template for $object/$tab/key ($default_template)") if $default_template;
