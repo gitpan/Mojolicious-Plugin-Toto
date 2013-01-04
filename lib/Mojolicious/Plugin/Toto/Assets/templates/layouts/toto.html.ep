@@ -4,8 +4,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- http://twitter.github.com/bootstrap/examples/fluid.html -->
 <title><%= title %></title>
-%= base_tag
-%= javascript '/bootstrap/js/bootstrap-dropdown.js';
 %= javascript '/js/jquery.js';
 %= javascript '/bootstrap/js/bootstrap.min.js';
 %= javascript '/bootstrap/js/bootstrap-typeahead.js';
