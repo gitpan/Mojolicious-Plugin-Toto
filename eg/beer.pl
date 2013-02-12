@@ -7,6 +7,14 @@ sub browse {
     shift->render_text("this is a page to browse beer");
 }
 
+sub drink {
+    my $c = shift;
+    my $beer = $c->current_instance;
+    return $c->render_exception("NO BEER");
+    warn "ready to drink beer";
+    return 1;
+}
+
 package Foo;
 use Mojo::Base 'Mojolicious::Controller';
 
@@ -50,7 +58,7 @@ plugin 'toto' =>
   tabs => {
     brewery => [ 'view', 'edit', 'directions', 'beers', 'info' ],
     pub     => [ 'view', 'info', 'comments', 'hours' ],
-    beer    => [ 'view', 'edit', 'pictures', 'notes' ],
+    beer    => [ 'view', 'edit', 'pictures', 'notes', 'drink' ],
   };
 
 app->start;
@@ -63,4 +71,6 @@ This is the landing page, all the toto stuff is
 here
 %= end
 
+@@ beer/drink.html.ep
+drinking beer <%= $beer %>
 

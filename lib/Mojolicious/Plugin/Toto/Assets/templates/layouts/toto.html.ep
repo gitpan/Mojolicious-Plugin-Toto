@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- http://twitter.github.com/bootstrap/examples/fluid.html -->
 <title><%= title %></title>
-%= javascript '/js/jquery.js';
+%= javascript '/mojo/jquery/jquery.js';
 %= javascript '/bootstrap/js/bootstrap.min.js';
 %= javascript '/bootstrap/js/bootstrap-typeahead.js';
 %= javascript '/bootstrap/js/application.js';

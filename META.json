@@ -26,14 +26,14 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "3.70"
+            "Mojolicious" : "3.84"
          }
       }
    },
    "provides" : {
       "Mojolicious::Plugin::Toto" : {
          "file" : "lib/Mojolicious/Plugin/Toto.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "Mojolicious::Plugin::Toto::Model" : {
          "file" : "lib/Mojolicious/Plugin/Toto/Model.pm",
@@ -46,5 +46,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.23"
+   "version" : "0.24"
 }

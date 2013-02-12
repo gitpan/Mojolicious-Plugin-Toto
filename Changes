@@ -1,6 +1,9 @@
 
 Revision history for Mojolicious-Plugin-Toto
 
+0.24   Tue Feb 12 14:02:49 EST 2013
+       - updated location of jquery.js
+
 0.23   Fri Jan  4 11:47:57 PST 2013
        - removed base_tag
        - removed redundant bootstrap library
