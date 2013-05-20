@@ -4,7 +4,7 @@ package House;
 use Mojo::Base 'Mojolicious::Controller';
 
 sub list {
-    shift->render_text("in the house");
+    shift->render( text => "in the house" );
 }
 
 package main;
@@ -26,9 +26,9 @@ my $menu = [
     }
 ];
 
-get '/some/crazy/url' => sub { shift->render_text("hi there"); } => { nav_item => 'beer' } => "beer/search";
+get '/some/crazy/url' => sub { shift->render( text => "hi there" ); } => { nav_item => 'beer' } => "beer/search";
 
-get '/beer/browse' => sub { shift->render_text("my name is inigo montoya") } => { nav_item => 'beer' } => "beer/browse";
+get '/beer/browse' => sub { shift->render( text => "my name is inigo montoya" ) } => { nav_item => 'beer' } => "beer/browse";
 
 get '/house/list' => { controller => 'House', action => 'list', nav_item => 'house' } => 'house/list';
 

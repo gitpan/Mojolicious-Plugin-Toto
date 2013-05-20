@@ -15,6 +15,11 @@ my $builder = Module::Build->new(
     },
     add_to_cleanup      => [ 'Mojolicious-Plugin-Toto-*' ],
     create_makefile_pl => 'traditional',
+    meta_merge => {
+        resources => {
+            repository => 'https://github.com/bduggan/Mojolicious-Plugin-Toto',
+        },
+    },
 );
 
 $builder->add_build_element('ep');

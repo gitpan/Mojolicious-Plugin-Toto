@@ -5,13 +5,13 @@ use Mojo::Base 'Mojolicious::Controller';
 
 sub create {
     my $c = shift;
-    return $c->render_text('closed') if $c->param('close');
+    return $c->render( text => 'closed' ) if $c->param('close');
     $c->render(param => "thing");
 }
 
 sub open {
     my $c = shift;
-    return $c->render_text('closed') if $c->param('close');
+    return $c->render( text => 'closed' ) if $c->param('close');
     $c->render(param => "thing");
 }
 

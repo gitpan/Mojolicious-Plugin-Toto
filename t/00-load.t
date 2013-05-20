@@ -4,7 +4,7 @@ use Test::More tests => 9;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-get '/hello' => { layout => 'default' } => sub { shift->render_text('hello') };
+get '/hello' => { layout => 'default' } => sub { shift->render( text => 'hello' ) };
 
 plugin 'toto' => nav => [qw/this that theother/],
   sidebar     => {

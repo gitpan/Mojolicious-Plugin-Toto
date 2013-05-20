@@ -210,10 +210,6 @@ Document the autcomplete API.
 
 Brian Duggan C<bduggan@matatu.org>
 
-=head1 SEE ALSO
-
-L<beer.dotcloud.com|http://www.beer.dotcloud.com>
-
 =cut
 
 package Mojolicious::Plugin::Toto;
@@ -227,7 +223,7 @@ use Cwd qw/abs_path/;
 use strict;
 use warnings;
 
-our $VERSION = "0.24";
+our $VERSION = "0.25";
 
 sub _render_static {
     my $c = shift;
@@ -421,7 +417,7 @@ sub register {
                         my $results = $c->model_class->autocomplete( q => $query, object => $object, c => $c, tab => $c->param('tab') );
                         # Expects an array ref of the form
                         #    [ { name => 'foo', href => 'bar' }, ]
-                        $c->render_json( $results );
+                        $c->render( json => $results );
                       } => "$object/autocomplete");
             }
         }

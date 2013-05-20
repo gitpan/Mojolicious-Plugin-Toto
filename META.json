@@ -33,7 +33,7 @@
    "provides" : {
       "Mojolicious::Plugin::Toto" : {
          "file" : "lib/Mojolicious/Plugin/Toto.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "Mojolicious::Plugin::Toto::Model" : {
          "file" : "lib/Mojolicious/Plugin/Toto/Model.pm",
@@ -44,7 +44,10 @@
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/bduggan/Mojolicious-Plugin-Toto"
+      }
    },
-   "version" : "0.24"
+   "version" : "0.25"
 }
